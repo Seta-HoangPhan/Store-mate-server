@@ -1,0 +1,10 @@
+# Python
+__pycache__/
+*.pyo
+
+# Env & secrets
+.env
+.venv
+
+# Poetry
+poetry.log
