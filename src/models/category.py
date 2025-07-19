@@ -1,6 +1,7 @@
-from .base import Base, TimestampMixin
 from sqlalchemy import Column, Integer, String, Text
 from sqlalchemy.orm import relationship
+
+from .base import Base, TimestampMixin
 
 
 class Category(Base, TimestampMixin):

@@ -31,6 +31,7 @@ if config.config_file_name is not None:
 from src.models.base import Base
 from src.models import (
     admin,
+    temp_admin,
     category,
     product,
     order,

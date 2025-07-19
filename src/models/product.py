@@ -1,6 +1,7 @@
-from .base import Base, TimestampMixin
-from sqlalchemy import Column, Integer, String, Text, ForeignKey, Numeric
+from sqlalchemy import Column, ForeignKey, Integer, Numeric, String, Text
 from sqlalchemy.orm import relationship
+
+from .base import Base, TimestampMixin
 
 
 # do not allow deletion of products

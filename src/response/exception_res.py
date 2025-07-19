@@ -14,10 +14,6 @@ def conflict(detail: str = "Conflict"):
     raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=detail)
 
 
-def unprocessable_entity(detail: str = "Unprocessable entity"):
-    raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=detail)
-
-
 def internal_error(detail: str = "Internal server error"):
     raise HTTPException(
         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=detail

@@ -1,5 +1,6 @@
-from sqlalchemy import Column, Integer, ForeignKey, Numeric
+from sqlalchemy import Column, ForeignKey, Integer, Numeric
 from sqlalchemy.orm import relationship
+
 from .base import Base, TimestampMixin
 
 

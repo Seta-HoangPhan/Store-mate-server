@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, Request
 from psycopg2.errors import ForeignKeyViolation, UniqueViolation
 from sqlalchemy.exc import IntegrityError
 
@@ -15,10 +15,6 @@ def register_exception_handler(app: FastAPI):
             return exception_res.bad_request(err_msg.FOREIGN_KEY_VIOLATION)
 
         return exception_res.bad_request(err_msg.DB_ERR)
-
-    @app.exception_handler(HTTPException)
-    async def handle_http_exception(req: Request, exc: HTTPException):
-        raise exc
 
     @app.exception_handler(Exception)
     async def handle_general_exception(request: Request, exc: Exception):
