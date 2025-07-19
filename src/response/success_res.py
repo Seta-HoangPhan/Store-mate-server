@@ -1,5 +1,5 @@
+from fastapi import status
 from fastapi.responses import JSONResponse
-from starlette import status
 
 
 def ok(detail: str = None, data=None):

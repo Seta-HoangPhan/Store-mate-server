@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, Integer, String, Boolean
 
 from .base import Base, TimestampMixin
 
@@ -10,6 +10,7 @@ class TempAdmin(Base, TimestampMixin):
     phone = Column(String(20), nullable=False, unique=True)
     email = Column(String(100), unique=True)
     password = Column(String(100), nullable=False)
+    is_root = Column(Boolean, default=False)
     otp = Column(String(6), nullable=False)
     expiration = Column(
         Integer, nullable=False, default=2

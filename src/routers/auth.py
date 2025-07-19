@@ -2,40 +2,45 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
 from dependencies.get_db import get_db
-from schemas.admin import AdminSchema, ResendOTPSchema, VerifyOTPSchema
+from schemas.admin import AdminSchema
+from schemas.auth import LoginSchema, ResendOTPSchema, VerifyOTPSchema
 from services import auth
 
 router = APIRouter(prefix="/auth")
 
 
 @router.post("/register-first-admin")
-async def register_first_admin(admin_info: AdminSchema, db: Session = Depends(get_db)):
-    return auth.request_first_admin_otp(admin_info, db)
+def register_first_admin(admin_info: AdminSchema, db: Session = Depends(get_db)):
+    return auth.request_root_admin_creation(admin_info, db)
 
 
 @router.post("/resend-otp")
-async def resend_otp(resend: ResendOTPSchema, db: Session = Depends(get_db)):
-    return auth.re_send_otp(resend.phone, db)
+def resend_otp(resend: ResendOTPSchema, db: Session = Depends(get_db)):
+    return auth.resend_otp(resend, db)
 
 
 @router.post("/verify-otp")
-async def verify_otp(otp_info: VerifyOTPSchema, db: Session = Depends(get_db)):
+def verify_otp(otp_info: VerifyOTPSchema, db: Session = Depends(get_db)):
     return auth.verify_otp(otp_info, db)
 
 
 @router.post("/login")
-async def login(credentials: dict, db: Session = Depends(get_db)):
-    # Implement your login logic here
-    return {"message": "Login successful"}
+def login(data: LoginSchema, db: Session = Depends(get_db)):
+    return auth.login(data, db)
 
 
-@router.patch("/update-profile")
-async def update_profile(user_id: int, profile_data: dict):
-    # Implement your update profile logic here
-    return {"message": "Profile updated successfully"}
+@router.post("/re-generate-access-token")
+def regenerate_access_token(data: LoginSchema, db: Session = Depends(get_db)):
+    return auth.regenerate_access_token(data, db)
 
 
-@router.post("/forgot-password")
-async def forgot_password(email: str):
-    # Implement your forgot password logic here
-    return {"message": "Password reset link sent"}
+# @router.patch("/update-profile")
+# def update_profile(user_id: int, profile_data: dict, me: dict = Depends(get_curr_user)):
+#     # Implement your update profile logic here
+#     return {"message": "Profile updated successfully"}
+
+
+# @router.post("/forgot-password")
+# def forgot_password(email: str):
+#     # Implement your forgot password logic here
+#     return {"message": "Password reset link sent"}

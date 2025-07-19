@@ -6,9 +6,15 @@ def not_found(resource: str):
 EXIST_FIRST_ADMIN = "The first admin user already exists"
 INVALID_PHONE = "Invalid phone number format"
 EMAIL_EXIST = "This email already exists"
+PHONE_EXIST = "This phone number already exists"
 NO_OTP_REQUEST = "No OTP request found"
 INVALID_OTP = "The provided OTP is invalid"
 EXPIRED_OTP = "OTP has expired, please request a new one"
+INVALID_PASSWORD = "The provided password is invalid"
+INVALID_TOKEN = "The provided token is invalid or has expired"
+NOT_FOUND_USER_OR_INVALID_TOKEN = "User not found or invalid token"
+
+CAN_NOT_DELETE_ROOT_ADMIN = "Root admin cannot be deleted"
 
 INTERNAL_SERVER_ERR = "Internal server error"
 DUPLICATE_ENTRY = "Duplicate entry – this value already exists"
@@ -16,3 +22,4 @@ FOREIGN_KEY_VIOLATION = (
     "Foreign key constraint violation – referenced item does not exist"
 )
 DB_ERR = "Database integrity error"
+FORBIDDEN = "Access denied. Insufficient permissions"
