@@ -2,6 +2,10 @@ def not_found(resource: str):
     return f"{resource.capitalize()} was not found"
 
 
+def exist(resource: str):
+    return f"{resource.capitalize()} already exist"
+
+
 # authentication error messages
 EXIST_FIRST_ADMIN = "The first admin user already exists"
 INVALID_PHONE = "Invalid phone number format"
@@ -23,3 +27,5 @@ FOREIGN_KEY_VIOLATION = (
 )
 DB_ERR = "Database integrity error"
 FORBIDDEN = "Access denied. Insufficient permissions"
+
+INVALID_DECIMAL = "Price must have at most 10 digits in total, including 2 decimal places (e.g., 99999999.99)"

@@ -32,13 +32,10 @@ from src.models.base import Base
 from src.models import (
     admin,
     temp_admin,
-    category,
     product,
     order,
-    order_product,
     customer,
     purchase,
-    purchase_product,
     supplier,
 )
 
