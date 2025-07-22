@@ -3,7 +3,12 @@ from sqlalchemy.orm import Session
 
 from dependencies.get_db import get_db
 from schemas.admin import AdminSchema
-from schemas.auth import LoginSchema, ResendOTPSchema, VerifyOTPSchema
+from schemas.auth import (
+    LoginSchema,
+    ResendOTPSchema,
+    VerifyOTPSchema,
+    RefreshTokenSchema,
+)
 from services import auth as service
 
 router = APIRouter(prefix="/auth")
@@ -30,7 +35,7 @@ def login(data: LoginSchema, db: Session = Depends(get_db)):
 
 
 @router.post("/re-generate-access-token")
-def regenerate_access_token(data: LoginSchema, db: Session = Depends(get_db)):
+def regenerate_access_token(data: RefreshTokenSchema, db: Session = Depends(get_db)):
     return service.regenerate_access_token(data, db)
 
 

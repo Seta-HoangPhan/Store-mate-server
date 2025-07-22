@@ -11,6 +11,8 @@ class Category(Base, TimestampMixin):
     name = Column(String(100), unique=True, nullable=False)
     description = Column(Text)
 
+    products = relationship("Product", back_populates="category", passive_deletes=True)
+
 
 # do not allow deletion of products
 class Product(Base, TimestampMixin):
@@ -20,6 +22,7 @@ class Product(Base, TimestampMixin):
     name = Column(String(100), nullable=False, unique=True)
     description = Column(Text)
     thumbnail = Column(String(500))
+    thumbnail_id = Column(String, unique=True)
     last_unit_price = Column(Numeric(10, 2))
     curr_unit_price = Column(Numeric(10, 2), nullable=False)
     selling_price = Column(Numeric(10, 2), nullable=False)
@@ -28,15 +31,10 @@ class Product(Base, TimestampMixin):
         Integer, ForeignKey("categories.id", ondelete="SET NULL"), nullable=True
     )
 
+    category = relationship("Category", back_populates="products")
     purchase_products = relationship(
         "PurchaseProducts", back_populates="product", passive_deletes=True
     )
     order_products = relationship(
         "OrderProduct", back_populates="product", passive_deletes=True
     )
-
-
-Category.products = relationship(
-    "Product", back_populates="category", passive_deletes=True
-)
-Product.category = relationship("Category", back_populates="products")

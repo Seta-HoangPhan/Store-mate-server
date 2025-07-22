@@ -3,7 +3,7 @@ from typing import Optional
 
 from pydantic import BaseModel, Field, field_validator
 
-from response import err_msg
+from validations.decimal_validate import decimal_validate
 
 
 class ProductSchema(BaseModel):
@@ -17,22 +17,47 @@ class ProductSchema(BaseModel):
 
     @field_validator("last_unit_price", "curr_unit_price", "selling_price")
     def validate_decimal(cls, v: Optional[Decimal]):
-        if v is None:
-            return v
-
-        rounded = v.quantize(Decimal("0.01"))  # Enforce 2 decimal places
-        # Validate: max 8 digits before decimal, 2 after (total 10)
-        sign, digits, exponent = rounded.as_tuple()
-        digits_before = len(digits) + exponent if exponent < 0 else len(digits)
-        if digits_before > 8:
-            raise ValueError(err_msg.INVALID_DECIMAL)
-
-        return rounded
+        return decimal_validate(v)
 
     class Config:
         from_attributes = True
 
 
-class ProductResponseSchema(ProductSchema):
+class UpdateProductSchema(BaseModel):
+    name: Optional[str] = None
+    description: Optional[str] = None
+    last_unit_price: Optional[Decimal] = Field(default=None, gt=0)
+    curr_unit_price: Optional[Decimal] = Field(default=None, gt=0)
+    selling_price: Optional[Decimal] = Field(default=None, gt=0)
+    stock_quantity: Optional[int] = None
+    category_id: Optional[int] = None
+
+    @field_validator("last_unit_price", "curr_unit_price", "selling_price")
+    def validate_decimal(cls, v: Optional[Decimal]):
+        return decimal_validate(v)
+
+    class Config:
+        from_attributes = True
+
+
+class PartialCategorySchema(BaseModel):
     id: int
+    name: str
+
+    class Config:
+        from_attributes = True
+
+
+class ProductResponseSchema(BaseModel):
+    id: int
+    name: str
+    description: Optional[str]
     thumbnail: Optional[str] = None
+    last_unit_price: Optional[float] = None
+    curr_unit_price: float
+    selling_price: Optional[float] = None
+    stock_quantity: int
+    category: Optional[PartialCategorySchema] = None
+
+    class Config:
+        from_attributes = True

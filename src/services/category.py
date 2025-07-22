@@ -1,11 +1,12 @@
 from sqlalchemy.orm import Session
-from schemas.category import (
-    CategorySchema,
-    CategoryResponseSchema,
-    UpdateCategorySchema,
-)
+
 from models.product import Category
 from response import err_msg, exception_res, success_msg, success_res
+from schemas.category import (
+    CategoryResponseSchema,
+    CategorySchema,
+    UpdateCategorySchema,
+)
 
 RESOURCE = "Category"
 
@@ -18,6 +19,16 @@ def get_all_categories(db: Session):
             CategoryResponseSchema.model_validate(cat).model_dump() for cat in db_cats
         ]
     )
+
+
+def get_all_products_by_category(cat_id: int, db: Session):
+    db_cat = db.query(Category).filter(Category.id == cat_id).first()
+    if not db_cat:
+        return exception_res.conflict(err_msg.not_found(RESOURCE))
+
+    dict_cat = CategoryResponseSchema.model_validate(db_cat).model_dump()
+
+    return success_res.ok(data=dict_cat["products"])
 
 
 def create_category(data: CategorySchema, db: Session):
@@ -42,7 +53,6 @@ def update_category_by_id(data: UpdateCategorySchema, db: Session, id: int):
         return exception_res.not_found(err_msg.not_found(RESOURCE))
 
     update_data = data.model_dump(exclude_unset=True)
-
     for key, value in update_data.items():
         setattr(db_cat, key, value)
 

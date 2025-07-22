@@ -11,6 +11,9 @@ security = HTTPBearer()
 def get_me(credentials: HTTPAuthorizationCredentials = Depends(security)):
     token = credentials.credentials
     try:
+        if not token:
+            return exception_res.unauthorized(err_msg.MISSING_TOKEN)
+
         payload = jwt.decode(
             token, settings.access_token_key, algorithms=[settings.algorithm]
         )

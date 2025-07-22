@@ -11,6 +11,13 @@ cloudinary.config(
 )
 
 
-def upload_image_to_cloudinary(file: UploadFile) -> str:
-    result = cloudinary.uploader.upload(file.file)
-    return result.get("secure_url")
+def upload_image_to_cloudinary(file: UploadFile):
+    result = cloudinary.uploader.upload(file.file, folder="product_thumbnails")
+    return {
+        "public_id": result.get("public_id"),
+        "secure_url": result.get("secure_url"),
+    }
+
+
+def delete_image(public_id: str):
+    cloudinary.uploader.destroy(public_id)

@@ -9,7 +9,7 @@ class Purchase(Base, TimestampMixin):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     supplier_id = Column(
-        Integer, ForeignKey("suppliers.id", ondelete="CASCADE"), nullable=False
+        Integer, ForeignKey("suppliers.id", ondelete="SET NULL"), nullable=False
     )
     total_amount = Column(Numeric(10, 2), nullable=False)
 
