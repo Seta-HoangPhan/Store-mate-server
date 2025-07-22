@@ -1,37 +1,27 @@
 from typing import Optional
 
-from pydantic import BaseModel, EmailStr, field_validator
+from pydantic import EmailStr
 
-from validations.phone_validate import phone_validate
+from .base import BaseSchemaModel, phone_validator
 
 
-class SupplierSchema(BaseModel):
+class SupplierSchema(BaseSchemaModel):
     name: str
     phone: str
     email: Optional[EmailStr] = None
     address: str
 
-    @field_validator("phone")
-    def validate_phone(cls, v: str):
-        return phone_validate(v)
-
-    class Config:
-        from_attributes = True
+    _validate_phone = phone_validator()
 
 
 class SupplierResponseSchema(SupplierSchema):
     id: int
 
 
-class UpdateSupplierSchema(BaseModel):
+class UpdateSupplierSchema(BaseSchemaModel):
     name: Optional[str] = None
     phone: Optional[str] = None
     email: Optional[EmailStr] = None
     address: Optional[str] = None
 
-    @field_validator("phone")
-    def validate_phone(cls, v: str):
-        return phone_validate(v)
-
-    class Config:
-        from_attributes = True
+    _validate_phone = phone_validator()

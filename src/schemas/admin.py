@@ -1,37 +1,24 @@
 from typing import Optional
 
-from pydantic import BaseModel, EmailStr, field_validator
+from pydantic import EmailStr
 
-from validations.phone_validate import phone_validate
+from .base import BaseSchemaModel, phone_validator
 
 
-class AdminSchema(BaseModel):
+class AdminSchema(BaseSchemaModel):
     phone: str
     email: Optional[EmailStr] = None
 
-    @field_validator("phone")
-    def validate_phone(cls, v):
-        return phone_validate(v)
-
-    class Config:
-        from_attributes = True
+    _validate_phone = phone_validator()
 
 
-class AdminResponseSchema(BaseModel):
+class AdminResponseSchema(BaseSchemaModel):
     id: int
     phone: str
     email: Optional[EmailStr] = None
 
-    class Config:
-        from_attributes = True
 
-
-class DeleteAdminSchema(BaseModel):
+class DeleteAdminSchema(BaseSchemaModel):
     phone: str
 
-    @field_validator("phone")
-    def validate_phone(cls, v):
-        return phone_validate(v)
-
-    class Config:
-        from_attributes = True
+    _validate_phone = phone_validator()

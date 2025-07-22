@@ -1,12 +1,11 @@
 from decimal import Decimal
 from typing import Optional
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import Field
+from .base import BaseSchemaModel
 
-from validations.decimal_validate import decimal_validate
 
-
-class ProductSchema(BaseModel):
+class ProductSchema(BaseSchemaModel):
     name: str
     description: Optional[str] = None
     last_unit_price: Optional[Decimal] = Field(default=None, gt=0)
@@ -15,15 +14,8 @@ class ProductSchema(BaseModel):
     stock_quantity: int
     category_id: Optional[int] = None
 
-    @field_validator("last_unit_price", "curr_unit_price", "selling_price")
-    def validate_decimal(cls, v: Optional[Decimal]):
-        return decimal_validate(v)
 
-    class Config:
-        from_attributes = True
-
-
-class UpdateProductSchema(BaseModel):
+class UpdateProductSchema(BaseSchemaModel):
     name: Optional[str] = None
     description: Optional[str] = None
     last_unit_price: Optional[Decimal] = Field(default=None, gt=0)
@@ -32,23 +24,13 @@ class UpdateProductSchema(BaseModel):
     stock_quantity: Optional[int] = None
     category_id: Optional[int] = None
 
-    @field_validator("last_unit_price", "curr_unit_price", "selling_price")
-    def validate_decimal(cls, v: Optional[Decimal]):
-        return decimal_validate(v)
 
-    class Config:
-        from_attributes = True
-
-
-class PartialCategorySchema(BaseModel):
+class PartialCategorySchema(BaseSchemaModel):
     id: int
     name: str
 
-    class Config:
-        from_attributes = True
 
-
-class ProductResponseSchema(BaseModel):
+class ProductResponseSchema(BaseSchemaModel):
     id: int
     name: str
     description: Optional[str]
@@ -58,6 +40,3 @@ class ProductResponseSchema(BaseModel):
     selling_price: Optional[float] = None
     stock_quantity: int
     category: Optional[PartialCategorySchema] = None
-
-    class Config:
-        from_attributes = True

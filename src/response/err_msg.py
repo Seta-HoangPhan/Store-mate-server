@@ -31,3 +31,4 @@ DB_ERR = "Database integrity error"
 FORBIDDEN = "Access denied. Insufficient permissions"
 
 INVALID_DECIMAL = "Price must have at most 10 digits in total, including 2 decimal places (e.g., 99999999.99)"
+INVALID_DISCOUNT = "Discount should be from 0.00% to 100.00%"

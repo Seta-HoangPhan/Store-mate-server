@@ -3,7 +3,7 @@ import re
 from response import err_msg
 
 
-def phone_validate(v: str):
+def validate_phone(v: str):
     v = re.sub(r"[ \-]", "", v)  # Remove spaces and dashes
 
     # Regex: after +84 requires 3|5|7|8|9 and then 8 digits

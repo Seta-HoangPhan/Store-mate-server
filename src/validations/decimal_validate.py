@@ -1,16 +1,16 @@
 from decimal import Decimal
+from typing import Optional
+
 from response import err_msg
 
 
-def decimal_validate(v: Decimal):
+def validate_discount(v: Optional[Decimal]):
     if v is None:
         return v
 
-    rounded = v.quantize(Decimal("0.01"))  # Enforce 2 decimal places
-    # Validate: max 8 digits before decimal, 2 after (total 10)
-    sign, digits, exponent = rounded.as_tuple()
-    digits_before = len(digits) + exponent if exponent < 0 else len(digits)
-    if digits_before > 8:
-        raise ValueError(err_msg.INVALID_DECIMAL)
+    rounded = v.quantize(Decimal("0.01"))
+
+    if rounded < 0 or rounded > Decimal("100.00"):
+        raise ValueError(err_msg.INVALID_DISCOUNT)
 
     return rounded

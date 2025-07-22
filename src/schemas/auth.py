@@ -1,43 +1,27 @@
-from pydantic import BaseModel, field_validator
-from validations.phone_validate import phone_validate
+from .base import BaseSchemaModel, phone_validator
 
 
-class ResendOTPSchema(BaseModel):
+class ResendOTPSchema(BaseSchemaModel):
     phone: str
 
-    @field_validator("phone")
-    def validate_phone(cls, v):
-        return phone_validate(v)
-
-    class Config:
-        from_attributes = True
+    _validate_phone = phone_validator()
 
 
-class VerifyOTPSchema(BaseModel):
+class VerifyOTPSchema(BaseSchemaModel):
     otp: str
     phone: str
 
-    @field_validator("phone")
-    def validate_phone(cls, v):
-        return phone_validate(v)
-
-    class Config:
-        from_attributes = True
+    _validate_phone = phone_validator()
 
 
-class LoginSchema(BaseModel):
+class LoginSchema(BaseSchemaModel):
     phone: str
     password: str
 
-    @field_validator("phone")
-    def validate_phone(cls, v):
-        return phone_validate(v)
-
-    class Config:
-        from_attributes = True
+    _validate_phone = phone_validator()
 
 
-class RefreshTokenSchema(BaseModel):
+class RefreshTokenSchema(BaseSchemaModel):
     refresh_token: str
 
     class Config:
