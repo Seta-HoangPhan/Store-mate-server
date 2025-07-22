@@ -11,7 +11,7 @@ class Purchase(Base, TimestampMixin):
     supplier_id = Column(
         Integer, ForeignKey("suppliers.id", ondelete="SET NULL"), nullable=False
     )
-    total_amount = Column(Numeric(10, 2), nullable=False)
+    total_amount = Column(Numeric(scale=2), nullable=False)
 
     supplier = relationship("Supplier", back_populates="purchases")
     purchase_products = relationship(
@@ -27,8 +27,8 @@ class PurchaseProducts(Base, TimestampMixin):
         Integer, ForeignKey("purchases.id", ondelete="CASCADE"), nullable=False
     )
     product_id = Column(Integer, ForeignKey("products.id"), nullable=False)
-    unit_price = Column(Numeric(10, 2), nullable=False)
-    discount = Column(Numeric(10, 2), default=0.00)
+    unit_price = Column(Numeric(scale=2), nullable=False)
+    discount = Column(Numeric(5, 2), default=0.00)
     purchase_quantity = Column(Integer, nullable=False)
 
     purchase = relationship("Purchase", back_populates="purchase_products")

@@ -11,7 +11,7 @@ class Order(Base, TimestampMixin):
     customer_id = Column(
         Integer, ForeignKey("customers.id", ondelete="CASCADE"), nullable=False
     )
-    discount = Column(Numeric(10, 2), default=0.00)
+    discount = Column(Numeric(5, 2), default=0.00)
 
     customer = relationship("Customer", back_populates="orders")
     order_products = relationship(
@@ -28,7 +28,7 @@ class OrderProduct(Base, TimestampMixin):
     )
     product_id = Column(Integer, ForeignKey("products.id"), nullable=False)
     quantity = Column(Integer, nullable=False)
-    price = Column(Numeric(10, 2), nullable=False)
+    price = Column(Numeric(scale=2), nullable=False)
 
     order = relationship("Order", back_populates="order_products")
     product = relationship("Product", back_populates="order_products")
