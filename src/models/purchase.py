@@ -19,7 +19,7 @@ class Purchase(Base, TimestampMixin):
     )
 
 
-class PurchaseProducts(Base, TimestampMixin):
+class PurchaseProduct(Base, TimestampMixin):
     __tablename__ = "purchase_products"
 
     id = Column(Integer, primary_key=True, autoincrement=True)

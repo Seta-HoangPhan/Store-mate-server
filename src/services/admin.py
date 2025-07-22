@@ -1,19 +1,18 @@
+from sqlalchemy import exists
 from sqlalchemy.orm import Session
 
 from models.admin import Admin
 from response import err_msg, exception_res, success_msg, success_res
-from schemas.admin import AdminSchema, DeleteAdminSchema, AdminResponseSchema
-from schemas.auth import VerifyOTPSchema, ResendOTPSchema
+from schemas.admin import AdminResponseSchema, AdminSchema, DeleteAdminSchema
+from schemas.auth import ResendOTPSchema, VerifyOTPSchema
 from services import auth
+from utils import convert_to_dict_data
 
 RESOURCE = "Admin"
 
 
 def check_root_admin(me: dict, db: Session) -> bool:
-    root_admin = (
-        db.query(Admin).filter(Admin.phone == me["phone"], Admin.is_root).first()
-    )
-    if not root_admin:
+    if not db.query(exists().where(Admin.phone == me["phone"], Admin.is_root)).scalar():
         return exception_res.forbidden(err_msg.FORBIDDEN)
 
 
@@ -21,11 +20,8 @@ def check_root_admin(me: dict, db: Session) -> bool:
 def get_all_admins(db: Session, me: dict):
     check_root_admin(me, db)
     admins = db.query(Admin).filter(~Admin.is_root).all()
-    print(f"Admins: {admins}")
     return success_res.ok(
-        data=[
-            AdminResponseSchema.model_validate(admin).model_dump() for admin in admins
-        ]
+        data=[convert_to_dict_data(AdminResponseSchema, admin) for admin in admins]
     )
 
 

@@ -6,13 +6,13 @@ from sqlalchemy.orm import Session
 
 from dependencies.get_db import get_db
 from dependencies.get_me import get_me
-from schemas.product import ProductSchema, UpdateProductSchema
+from schemas.product import ProdSchema, UpdateProdSchema
 from services import product as service
 
 router = APIRouter(prefix="/products", dependencies=[Depends(get_me)])
 
 
-def parse_product_form(
+def parse_prod_form(
     name: str = Form(...),
     description: Optional[str] = Form(None),
     last_unit_price: Optional[Decimal] = Form(None),
@@ -21,7 +21,7 @@ def parse_product_form(
     stock_quantity: int = Form(...),
     category_id: Optional[int] = Form(None),
 ):
-    return ProductSchema(
+    return ProdSchema(
         name=name,
         description=description,
         last_unit_price=last_unit_price,
@@ -33,12 +33,12 @@ def parse_product_form(
 
 
 @router.post("")
-def create_product(
-    data: ProductSchema = Depends(parse_product_form),
+def create_new_prod(
+    data: ProdSchema = Depends(parse_prod_form),
     thumbnail: Optional[UploadFile] = File(None),
     db: Session = Depends(get_db),
 ):
-    return service.create_new_product(data, thumbnail, db)
+    return service.create_new_prod(data, thumbnail, db)
 
 
 def parse_update_product_form(
@@ -50,7 +50,7 @@ def parse_update_product_form(
     stock_quantity: Optional[int] = Form(None),
     category_id: Optional[int] = Form(None),
 ):
-    return UpdateProductSchema(
+    return UpdateProdSchema(
         name=name,
         description=description,
         last_unit_price=last_unit_price,
@@ -62,10 +62,10 @@ def parse_update_product_form(
 
 
 @router.put("/{id}")
-def update_product(
+def update_prod_by_id(
     id: int,
-    data: UpdateProductSchema = Depends(parse_update_product_form),
+    data: UpdateProdSchema = Depends(parse_update_product_form),
     thumbnail: Optional[UploadFile] = File(None),
     db: Session = Depends(get_db),
 ):
-    return service.update_product_by_id(data, id, thumbnail, db)
+    return service.update_prod_by_id(data, id, thumbnail, db)

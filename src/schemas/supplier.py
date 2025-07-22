@@ -5,7 +5,7 @@ from pydantic import EmailStr
 from .base import BaseSchemaModel, phone_validator
 
 
-class SupplierSchema(BaseSchemaModel):
+class SupSchema(BaseSchemaModel):
     name: str
     phone: str
     email: Optional[EmailStr] = None
@@ -14,11 +14,11 @@ class SupplierSchema(BaseSchemaModel):
     _validate_phone = phone_validator()
 
 
-class SupplierResponseSchema(SupplierSchema):
+class SupResSchema(SupSchema):
     id: int
 
 
-class UpdateSupplierSchema(BaseSchemaModel):
+class UpdateSupSchema(BaseSchemaModel):
     name: Optional[str] = None
     phone: Optional[str] = None
     email: Optional[EmailStr] = None

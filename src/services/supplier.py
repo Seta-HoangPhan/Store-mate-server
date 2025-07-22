@@ -4,39 +4,34 @@ from sqlalchemy.orm import Session
 from models.supplier import Supplier
 from response import err_msg, exception_res, success_msg, success_res
 from schemas.supplier import (
-    SupplierResponseSchema,
-    SupplierSchema,
-    UpdateSupplierSchema,
+    SupResSchema,
+    SupSchema,
+    UpdateSupSchema,
 )
+from utils import convert_to_dict_data, convert_update_data
 
 RESOURCE = "Supplier"
 
 
-def get_all_suppliers(db: Session):
+def get_all_sups(db: Session):
     db_suppliers = db.query(Supplier).all()
     return success_res.ok(
-        data=[
-            SupplierResponseSchema.model_validate(supplier).model_dump()
-            for supplier in db_suppliers
-        ]
+        data=[convert_to_dict_data(SupResSchema, supplier) for supplier in db_suppliers]
     )
 
 
-def search_suppliers_by_name(search: str, db: Session):
+def search_sups_by_name(search: str, db: Session):
     db_suppliers = (
         db.query(Supplier)
         .filter(func.unaccent(Supplier.name).ilike(f"%{search}%"))
         .all()
     )
     return success_res.ok(
-        data=[
-            SupplierResponseSchema.model_validate(supplier).model_dump()
-            for supplier in db_suppliers
-        ]
+        data=[convert_to_dict_data(SupResSchema, supplier) for supplier in db_suppliers]
     )
 
 
-def create_supplier(data: SupplierSchema, db: Session):
+def create_new_sup(data: SupSchema, db: Session):
     name = data.name.strip()
     phone = data.phone.strip()
     email = data.email.strip().lower() if data.email else None
@@ -64,24 +59,24 @@ def create_supplier(data: SupplierSchema, db: Session):
     db.refresh(new_supplier)
 
     return success_res.create(
-        data=SupplierResponseSchema.model_validate(new_supplier).model_dump(),
+        data=convert_to_dict_data(SupResSchema, new_supplier),
         detail=success_msg.create(RESOURCE),
     )
 
 
-def update_supplier(data: UpdateSupplierSchema, id: int, db: Session):
-    db_supplier = db.query(Supplier).filter(Supplier.id == id).first()
-    if not db_supplier:
+def update_sup(data: UpdateSupSchema, id: int, db: Session):
+    db_sup = db.query(Supplier).filter(Supplier.id == id).first()
+    if not db_sup:
         return exception_res.not_found(err_msg.not_found(RESOURCE))
 
-    update_data = data.model_dump(exclude_unset=True, exclude_none=True)
+    update_data = convert_update_data(data)
     for key, value in update_data.items():
-        setattr(db_supplier, key, value)
+        setattr(db_sup, key, value)
 
     db.commit()
-    db.refresh(db_supplier)
+    db.refresh(db_sup)
 
     return success_res.create(
-        data=SupplierResponseSchema.model_validate(db_supplier).model_dump(),
+        data=convert_to_dict_data(SupResSchema, db_sup),
         detail=success_msg.update(RESOURCE),
     )

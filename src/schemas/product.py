@@ -5,7 +5,7 @@ from pydantic import Field
 from .base import BaseSchemaModel
 
 
-class ProductSchema(BaseSchemaModel):
+class ProdSchema(BaseSchemaModel):
     name: str
     description: Optional[str] = None
     last_unit_price: Optional[Decimal] = Field(default=None, gt=0)
@@ -15,7 +15,7 @@ class ProductSchema(BaseSchemaModel):
     category_id: Optional[int] = None
 
 
-class UpdateProductSchema(BaseSchemaModel):
+class UpdateProdSchema(BaseSchemaModel):
     name: Optional[str] = None
     description: Optional[str] = None
     last_unit_price: Optional[Decimal] = Field(default=None, gt=0)
@@ -30,7 +30,7 @@ class PartialCategorySchema(BaseSchemaModel):
     name: str
 
 
-class ProductResponseSchema(BaseSchemaModel):
+class ProdResSchema(BaseSchemaModel):
     id: int
     name: str
     description: Optional[str]

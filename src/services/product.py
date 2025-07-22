@@ -1,25 +1,24 @@
 from fastapi import UploadFile
+from sqlalchemy import exists
 from sqlalchemy.orm import Session
 
 from cloudinary_config import delete_image, upload_image_to_cloudinary
 from models.product import Category, Product
 from response import err_msg, exception_res, success_msg, success_res
-from schemas.product import ProductResponseSchema, ProductSchema, UpdateProductSchema
-from utils import convert_decimal
+from schemas.product import ProdResSchema, ProdSchema, UpdateProdSchema
+from utils import convert_decimal, convert_to_dict_data, convert_update_data
 
 RESOURCE = "Product"
 DECIMAL_FIELDS = {"last_unit_price", "curr_unit_price", "selling_price"}
 
 
 # allow admin create product first time
-def create_new_product(data: ProductSchema, thumnail_file: UploadFile, db: Session):
-    db_product = db.query(Product).filter(Product.name == data.name).first()
-    if db_product:
+def create_new_prod(data: ProdSchema, thumnail_file: UploadFile, db: Session):
+    if db.query(exists().where(Product.name == data.name)).scalar():
         return exception_res.conflict(err_msg.exist(RESOURCE))
 
     if data.category_id:
-        db_category = db.query(Category).filter(Category.id == data.category_id).first
-        if not db_category:
+        if not db.query(exists().where(Category.id == data.category_id)).scalar():
             return exception_res.not_found(err_msg.not_found("category"))
 
     upload = None
@@ -42,24 +41,23 @@ def create_new_product(data: ProductSchema, thumnail_file: UploadFile, db: Sessi
     db.refresh(new_product)
 
     return success_res.create(
-        data=ProductResponseSchema.model_validate(new_product).model_dump(),
+        data=convert_to_dict_data(ProdResSchema, new_product),
         detail=success_msg.create(RESOURCE),
     )
 
 
-def update_product_by_id(
-    data: UpdateProductSchema, id: int, thumnail_file: UploadFile, db: Session
+def update_prod_by_id(
+    data: UpdateProdSchema, id: int, thumnail_file: UploadFile, db: Session
 ):
     db_prod = db.query(Product).filter(Product.id == id).first()
     if not db_prod:
         return exception_res.conflict(err_msg.not_found(RESOURCE))
 
     if data.category_id:
-        db_cat = db.query(Category).filter(Category.id == data.category_id).first()
-        if not db_cat:
+        if not db.query(exists().where(Category.id == data.category_id)).scalar():
             return exception_res.conflict(err_msg.not_found("Category"))
 
-    update_data = data.model_dump(exclude_unset=True, exclude_none=True)
+    update_data = convert_update_data(data)
 
     if thumnail_file:
         if db_prod.thumbnail_id:
@@ -79,6 +77,6 @@ def update_product_by_id(
     db.refresh(db_prod)
 
     return success_res.ok(
-        data=ProductResponseSchema.model_validate(db_prod).model_dump(),
+        data=convert_to_dict_data(ProdResSchema, db_prod),
         detail=success_msg.update(RESOURCE),
     )

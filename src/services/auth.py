@@ -12,10 +12,11 @@ from schemas.admin import AdminResponseSchema, AdminSchema
 from schemas.auth import (
     LoginSchema,
     RefreshTokenSchema,
-    VerifyOTPSchema,
     ResendOTPSchema,
+    VerifyOTPSchema,
 )
 from settings import settings
+from utils import convert_to_dict_data
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 expiration_limit = datetime.now(timezone.utc) - timedelta(
@@ -190,7 +191,7 @@ def login(data: LoginSchema, db: Session):
         data={
             "access_token": access_token,
             "refresh_token": refresh_token,
-            "admin": AdminResponseSchema.model_validate(db_admin).model_dump(),
+            "admin": convert_to_dict_data(AdminResponseSchema, db_admin),
         }
     )
 

@@ -1,21 +1,21 @@
 from typing import Optional
 
 from .base import BaseSchemaModel
-from .product import ProductResponseSchema
+from .product import ProdResSchema
 
 
-class CategorySchema(BaseSchemaModel):
+class CatSchema(BaseSchemaModel):
     name: str
     description: Optional[str] = None
 
 
-class UpdateCategorySchema(BaseSchemaModel):
+class UpdateCatSchema(BaseSchemaModel):
     name: Optional[str] = None
     description: Optional[str] = None
 
 
-class CategoryResponseSchema(BaseSchemaModel):
+class CatResSchema(BaseSchemaModel):
     id: int
     name: str
     description: Optional[str] = None
-    products: list[ProductResponseSchema] = []
+    products: list[ProdResSchema] = []

@@ -6,6 +6,10 @@ def exist(resource: str):
     return f"{resource.capitalize()} already exist"
 
 
+def missing(resource: str):
+    return f"Missing {resource.capitalize()}"
+
+
 # authentication error messages
 EXIST_FIRST_ADMIN = "The first admin user already exists"
 INVALID_PHONE = "Invalid phone number format"

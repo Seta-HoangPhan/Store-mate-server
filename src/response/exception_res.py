@@ -9,6 +9,10 @@ def unauthorized(detail: str = "Unauthorized"):
     raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=detail)
 
 
+def payment_required(detail: str = "Payment Required"):
+    raise HTTPException(status_code=status.HTTP_402_PAYMENT_REQUIRED, detail=detail)
+
+
 def forbidden(detail: str = "Forbidden"):
     raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=detail)
 
