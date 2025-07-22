@@ -1,12 +1,14 @@
 from fastapi import UploadFile
 from sqlalchemy.orm import Session
 
-from cloudinary_config import upload_image_to_cloudinary, delete_image
+from cloudinary_config import delete_image, upload_image_to_cloudinary
 from models.product import Category, Product
 from response import err_msg, exception_res, success_msg, success_res
 from schemas.product import ProductResponseSchema, ProductSchema, UpdateProductSchema
+from utils import convert_decimal
 
 RESOURCE = "Product"
+DECIMAL_FIELDS = {"last_unit_price", "curr_unit_price", "selling_price"}
 
 
 # allow admin create product first time
@@ -29,9 +31,9 @@ def create_new_product(data: ProductSchema, thumnail_file: UploadFile, db: Sessi
         description=data.description,
         thumbnail=upload["secure_url"] if upload else None,
         thumbnail_id=upload["public_id"] if upload else None,
-        last_unit_price=data.last_unit_price,
-        curr_unit_price=data.curr_unit_price,
-        selling_price=data.selling_price,
+        last_unit_price=convert_decimal(data.last_unit_price),
+        curr_unit_price=convert_decimal(data.curr_unit_price),
+        selling_price=convert_decimal(data.selling_price),
         stock_quantity=data.stock_quantity,
         category_id=data.category_id,
     )
@@ -68,6 +70,9 @@ def update_product_by_id(
         update_data["thumbnail_id"] = upload["public_id"] if upload else None
 
     for key, value in update_data.items():
+        if key in DECIMAL_FIELDS:
+            update_data[key] = convert_decimal(value)
+
         setattr(db_prod, key, value)
 
     db.commit()
