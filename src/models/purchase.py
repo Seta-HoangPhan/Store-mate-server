@@ -15,7 +15,7 @@ class Purchase(Base, TimestampMixin):
 
     supplier = relationship("Supplier", back_populates="purchases")
     purchase_products = relationship(
-        "PurchaseProducts", back_populates="purchase", cascade="all, delete"
+        "PurchaseProduct", back_populates="purchase", cascade="all, delete"
     )
 
 

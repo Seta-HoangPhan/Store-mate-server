@@ -33,7 +33,7 @@ class Product(Base, TimestampMixin):
 
     category = relationship("Category", back_populates="products")
     purchase_products = relationship(
-        "PurchaseProducts", back_populates="product", passive_deletes=True
+        "PurchaseProduct", back_populates="product", passive_deletes=True
     )
     order_products = relationship(
         "OrderProduct", back_populates="product", passive_deletes=True
