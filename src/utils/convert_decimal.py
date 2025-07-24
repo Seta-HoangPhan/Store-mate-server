@@ -1,4 +1,4 @@
-from decimal import Decimal
+from decimal import Decimal, ROUND_HALF_UP
 from typing import Optional
 
 
@@ -6,4 +6,5 @@ def convert_decimal(v: Optional[Decimal]):
     if v is None:
         return v
 
-    return v.quantize(Decimal(0.01))
+    d = Decimal(str(v))
+    return d.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)

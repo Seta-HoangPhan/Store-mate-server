@@ -23,8 +23,7 @@ class Product(Base, TimestampMixin):
     description = Column(Text)
     thumbnail = Column(String(500))
     thumbnail_id = Column(String, unique=True)
-    last_unit_price = Column(Numeric(scale=2))
-    curr_unit_price = Column(Numeric(scale=2), nullable=False)
+    unit_price = Column(Numeric(scale=2), nullable=False)
     selling_price = Column(Numeric(scale=2), nullable=False)
     stock_quantity = Column(Integer, nullable=False)
     category_id = Column(

@@ -12,6 +12,13 @@ RESOURCE = "Product"
 DECIMAL_FIELDS = {"last_unit_price", "curr_unit_price", "selling_price"}
 
 
+def find_prod_by_id(id: int, db: Session):
+    db_prod = db.query(Product).filter(Product.id == id).first()
+    if not db_prod:
+        return exception_res.not_found(err_msg.not_found(RESOURCE))
+    return db_prod
+
+
 # allow admin create product first time
 def create_new_prod(data: ProdSchema, thumnail_file: UploadFile, db: Session):
     if db.query(exists().where(Product.name == data.name)).scalar():
@@ -49,9 +56,7 @@ def create_new_prod(data: ProdSchema, thumnail_file: UploadFile, db: Session):
 def update_prod_by_id(
     data: UpdateProdSchema, id: int, thumnail_file: UploadFile, db: Session
 ):
-    db_prod = db.query(Product).filter(Product.id == id).first()
-    if not db_prod:
-        return exception_res.conflict(err_msg.not_found(RESOURCE))
+    db_prod = find_prod_by_id(id, db)
 
     if data.category_id:
         if not db.query(exists().where(Category.id == data.category_id)).scalar():

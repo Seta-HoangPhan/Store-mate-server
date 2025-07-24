@@ -1,4 +1,4 @@
-from sqlalchemy import Column, ForeignKey, Integer, Numeric
+from sqlalchemy import Column, ForeignKey, Integer, Numeric, Boolean
 from sqlalchemy.orm import relationship
 
 from .base import Base, TimestampMixin
@@ -11,7 +11,7 @@ class Purchase(Base, TimestampMixin):
     supplier_id = Column(
         Integer, ForeignKey("suppliers.id", ondelete="SET NULL"), nullable=False
     )
-    total_amount = Column(Numeric(scale=2), nullable=False)
+    is_update_product = Column(Boolean, nullable=False)
 
     supplier = relationship("Supplier", back_populates="purchases")
     purchase_products = relationship(
@@ -29,7 +29,7 @@ class PurchaseProduct(Base, TimestampMixin):
     product_id = Column(Integer, ForeignKey("products.id"), nullable=False)
     unit_price = Column(Numeric(scale=2), nullable=False)
     discount = Column(Numeric(5, 2), default=0.00)
-    purchase_quantity = Column(Integer, nullable=False)
+    quantity = Column(Integer, nullable=False)
 
     purchase = relationship("Purchase", back_populates="purchase_products")
     product = relationship("Product", back_populates="purchase_products")

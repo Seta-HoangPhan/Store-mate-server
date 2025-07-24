@@ -9,6 +9,13 @@ from utils import convert_to_dict_data, convert_update_data
 RESOURCE = "Supplier"
 
 
+def find_sup_by_id(id: int, db: Session):
+    db_sup = db.query(Supplier).filter(Supplier.id == id).first()
+    if not db_sup:
+        return exception_res.not_found(err_msg.not_found(RESOURCE))
+    return db_sup
+
+
 def get_all_sups(db: Session):
     db_suppliers = db.query(Supplier).all()
     return success_res.ok(
@@ -78,9 +85,7 @@ def update_sup_phone(data: dict, sup_id: int, db: Session):
 
 
 def update_sup(data: UpdateSupSchema, id: int, db: Session):
-    db_sup = db.query(Supplier).filter(Supplier.id == id).first()
-    if not db_sup:
-        return exception_res.not_found(err_msg.not_found(RESOURCE))
+    db_sup = find_sup_by_id(id, db)
 
     update_data = convert_update_data(data)
     for key, value in update_data.items():
