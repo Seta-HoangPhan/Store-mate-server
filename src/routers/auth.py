@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
-from dependencies.get_db import get_db
+from dependencies import get_db, get_me
 from schemas.admin import AdminSchema
 from schemas.auth import (
     LoginSchema,
@@ -29,12 +29,17 @@ def verify_otp(otp_info: VerifyOTPSchema, db: Session = Depends(get_db)):
     return service.verify_otp(otp_info, db)
 
 
+@router.get("/get-profile")
+def get_profile(user=Depends(get_me)):
+    return service.get_profile(user)
+
+
 @router.post("/login")
 def login(data: LoginSchema, db: Session = Depends(get_db)):
     return service.login(data, db)
 
 
-@router.post("/re-generate-access-token")
+@router.post("/refresh-token")
 def regenerate_access_token(data: RefreshTokenSchema, db: Session = Depends(get_db)):
     return service.regenerate_access_token(data, db)
 

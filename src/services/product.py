@@ -7,6 +7,7 @@ from models.product import Category, Product
 from response import err_msg, exception_res, success_msg, success_res
 from schemas.product import ProdResSchema, ProdSchema, UpdateProdSchema
 from utils import convert_decimal, convert_to_dict_data, convert_update_data
+from services import category as cat_service
 
 RESOURCE = "Product"
 DECIMAL_FIELDS = {"last_unit_price", "curr_unit_price", "selling_price"}
@@ -17,6 +18,27 @@ def find_prod_by_id(id: int, db: Session):
     if not db_prod:
         return exception_res.not_found(err_msg.not_found(RESOURCE))
     return db_prod
+
+
+def get_prod_by_id(id: int, db: Session):
+    db_prod = find_prod_by_id(id, db)
+    return success_res.ok(data=convert_to_dict_data(ProdResSchema, db_prod))
+
+
+def get_prods_by_cat_ids(cat_ids: list[int], db: Session):
+    filter_cat_ids = cat_ids
+    if len(cat_ids) == 0:
+        db_cats = db.query(Category).all()
+        filter_cat_ids = [cat.id for cat in db_cats]
+    cat_prods = {}
+    for cat_id in filter_cat_ids:
+        db_cat = cat_service.find_cat_by_id(cat_id, db)
+        prods = db.query(Product).filter(Product.category_id == db_cat.id).all()
+        cat_prods[db_cat.id] = [
+            convert_to_dict_data(ProdResSchema, prod) for prod in prods
+        ]
+
+    return success_res.ok(data=cat_prods)
 
 
 # allow admin create product first time
@@ -37,10 +59,9 @@ def create_new_prod(data: ProdSchema, thumnail_file: UploadFile, db: Session):
         description=data.description,
         thumbnail=upload["secure_url"] if upload else None,
         thumbnail_id=upload["public_id"] if upload else None,
-        last_unit_price=convert_decimal(data.last_unit_price),
-        curr_unit_price=convert_decimal(data.curr_unit_price),
+        unit_price=convert_decimal(data.unit_price),
         selling_price=convert_decimal(data.selling_price),
-        stock_quantity=data.stock_quantity,
+        quantity=data.quantity,
         category_id=data.category_id,
     )
     db.add(new_product)

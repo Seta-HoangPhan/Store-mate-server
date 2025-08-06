@@ -1,3 +1,4 @@
+from sqlalchemy import desc
 from sqlalchemy.orm import Session
 
 from models.product import Category
@@ -12,12 +13,25 @@ from utils import convert_to_dict_data, convert_update_data
 RESOURCE = "Category"
 
 
+def find_cat_by_id(id: int, db: Session):
+    db_prod = db.query(Category).filter(Category.id == id).first()
+    if not db_prod:
+        return exception_res.not_found(err_msg.not_found(RESOURCE))
+    return db_prod
+
+
 def get_all_cats(db: Session):
-    db_cats = db.query(Category).all()
+    db_cats = db.query(Category).order_by(desc(Category.created_at)).all()
 
     return success_res.ok(
         data=[convert_to_dict_data(CatResSchema, cat) for cat in db_cats]
     )
+
+
+def get_cat_by_id(id: int, db: Session):
+    db_cat = find_cat_by_id(id, db)
+
+    return success_res.ok(data=convert_to_dict_data(CatResSchema, db_cat))
 
 
 def get_all_prods_by_cat(cat_id: int, db: Session):

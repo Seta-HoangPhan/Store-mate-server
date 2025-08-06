@@ -1,7 +1,7 @@
 from decimal import Decimal
 from typing import Optional
 
-from fastapi import APIRouter, Depends, File, Form, UploadFile
+from fastapi import APIRouter, Depends, File, Form, UploadFile, Query
 from sqlalchemy.orm import Session
 
 from dependencies.get_db import get_db
@@ -12,22 +12,36 @@ from services import product as service
 router = APIRouter(prefix="/products", dependencies=[Depends(get_me)])
 
 
+@router.get("")
+def get_prods_by_cat_ids(
+    cat_ids: list[int] = Query(default=[]),
+    db: Session = Depends(get_db),
+):
+    return service.get_prods_by_cat_ids(cat_ids, db)
+
+
+@router.get("/{id}")
+def get_prod_by_id(
+    id: int,
+    db: Session = Depends(get_db),
+):
+    return service.get_prod_by_id(id, db)
+
+
 def parse_prod_form(
     name: str = Form(...),
     description: Optional[str] = Form(None),
-    last_unit_price: Optional[Decimal] = Form(None),
-    curr_unit_price: Decimal = Form(...),
+    unit_price: Optional[Decimal] = Form(None),
     selling_price: Optional[Decimal] = Form(...),
-    stock_quantity: int = Form(...),
+    quantity: int = Form(...),
     category_id: Optional[int] = Form(None),
 ):
     return ProdSchema(
         name=name,
         description=description,
-        last_unit_price=last_unit_price,
-        curr_unit_price=curr_unit_price,
+        unit_price=unit_price,
         selling_price=selling_price,
-        stock_quantity=stock_quantity,
+        quantity=quantity,
         category_id=category_id,
     )
 

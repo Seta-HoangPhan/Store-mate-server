@@ -25,7 +25,7 @@ class Product(Base, TimestampMixin):
     thumbnail_id = Column(String, unique=True)
     unit_price = Column(Numeric(scale=2), nullable=False)
     selling_price = Column(Numeric(scale=2), nullable=False)
-    stock_quantity = Column(Integer, nullable=False)
+    quantity = Column(Integer, nullable=False)
     category_id = Column(
         Integer, ForeignKey("categories.id", ondelete="SET NULL"), nullable=True
     )

@@ -15,6 +15,11 @@ def get_all_cats(db: Session = Depends(get_db)):
     return service.get_all_cats(db)
 
 
+@router.get("/{id}")
+def get_cat_by_id(id: int, db: Session = Depends(get_db)):
+    return service.get_cat_by_id(id, db)
+
+
 @router.get("/{id}/products")
 def get_prods_by_cat(id: int, db: Session = Depends(get_db)):
     return service.get_all_prods_by_cat(id, db)

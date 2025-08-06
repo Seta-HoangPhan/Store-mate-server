@@ -176,6 +176,10 @@ def gen_refresh_token(data: dict):
     )
 
 
+def get_profile(user: dict):
+    return success_res.ok(data=user)
+
+
 def login(data: LoginSchema, db: Session):
     db_admin = db.query(Admin).filter(Admin.phone == data.phone).first()
     if not db_admin:

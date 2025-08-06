@@ -1,4 +1,5 @@
 from pydantic_settings import BaseSettings
+from pathlib import Path
 
 
 class Settings(BaseSettings):
@@ -18,7 +19,7 @@ class Settings(BaseSettings):
     api_secret: str
 
     class Config:
-        env_file = ".env"
+        env_file = str(Path(__file__).resolve().parent.parent / ".env")
 
 
 settings = Settings()
