@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Text, Numeric, ForeignKey
+from sqlalchemy import Column, ForeignKey, Integer, Numeric, String, Text
 from sqlalchemy.orm import relationship
 
 from .base import Base, TimestampMixin
@@ -23,9 +23,8 @@ class Product(Base, TimestampMixin):
     description = Column(Text)
     thumbnail = Column(String(500))
     thumbnail_id = Column(String, unique=True)
-    unit_price = Column(Numeric(scale=2), nullable=False)
     selling_price = Column(Numeric(scale=2), nullable=False)
-    quantity = Column(Integer, nullable=False)
+    quantity = Column(Integer, default=0)
     category_id = Column(
         Integer, ForeignKey("categories.id", ondelete="SET NULL"), nullable=True
     )

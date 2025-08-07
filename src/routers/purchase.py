@@ -11,3 +11,8 @@ router = APIRouter(prefix="/purchases", dependencies=[Depends(get_me)])
 @router.post("")
 def create_new_pur(data: PurSchema, db: Session = Depends(get_db)):
     return service.create_new_pur(data, db)
+
+
+@router.put("/{id}")
+def update_pur_by_id(data: PurSchema, id: int, db: Session = Depends(get_db)):
+    return service.update_pur_by_id(data, id, db)

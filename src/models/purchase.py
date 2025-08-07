@@ -1,4 +1,4 @@
-from sqlalchemy import Column, ForeignKey, Integer, Numeric, Boolean
+from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, Numeric, func
 from sqlalchemy.orm import relationship
 
 from .base import Base, TimestampMixin
@@ -12,6 +12,7 @@ class Purchase(Base, TimestampMixin):
         Integer, ForeignKey("suppliers.id", ondelete="SET NULL"), nullable=False
     )
     is_update_product = Column(Boolean, nullable=False)
+    import_date = Column(DateTime(timezone=True), server_default=func.now())
 
     supplier = relationship("Supplier", back_populates="purchases")
     purchase_products = relationship(

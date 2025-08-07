@@ -4,8 +4,10 @@ from sqlalchemy.orm import Session
 
 from cloudinary_config import delete_image, upload_image_to_cloudinary
 from models.product import Category, Product
+from models.purchase import PurchaseProduct
 from response import err_msg, exception_res, success_msg, success_res
 from schemas.product import ProdResSchema, ProdSchema, UpdateProdSchema
+from schemas.purchase import PurProdResSchema
 from utils import convert_decimal, convert_to_dict_data, convert_update_data
 from services import category as cat_service
 
@@ -22,7 +24,26 @@ def find_prod_by_id(id: int, db: Session):
 
 def get_prod_by_id(id: int, db: Session):
     db_prod = find_prod_by_id(id, db)
-    return success_res.ok(data=convert_to_dict_data(ProdResSchema, db_prod))
+    db_pur_prods = (
+        db.query(PurchaseProduct).filter(PurchaseProduct.product_id == id).all()
+    )
+    pur_prods = [
+        convert_to_dict_data(PurProdResSchema, pur_prod) for pur_prod in db_pur_prods
+    ]
+    return success_res.ok(
+        data={
+            **convert_to_dict_data(ProdResSchema, db_prod),
+            "purchase_products": [
+                {
+                    **pur_prod,
+                    "net_price": pur_prod["unit_price"]
+                    * (100 - pur_prod["discount"])
+                    / 100,
+                }
+                for pur_prod in pur_prods
+            ],
+        }
+    )
 
 
 def get_prods_by_cat_ids(cat_ids: list[int], db: Session):
@@ -59,7 +80,6 @@ def create_new_prod(data: ProdSchema, thumnail_file: UploadFile, db: Session):
         description=data.description,
         thumbnail=upload["secure_url"] if upload else None,
         thumbnail_id=upload["public_id"] if upload else None,
-        unit_price=convert_decimal(data.unit_price),
         selling_price=convert_decimal(data.selling_price),
         quantity=data.quantity,
         category_id=data.category_id,

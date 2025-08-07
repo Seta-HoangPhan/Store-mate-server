@@ -31,7 +31,6 @@ def get_prod_by_id(
 def parse_prod_form(
     name: str = Form(...),
     description: Optional[str] = Form(None),
-    unit_price: Optional[Decimal] = Form(None),
     selling_price: Optional[Decimal] = Form(...),
     quantity: int = Form(...),
     category_id: Optional[int] = Form(None),
@@ -39,7 +38,6 @@ def parse_prod_form(
     return ProdSchema(
         name=name,
         description=description,
-        unit_price=unit_price,
         selling_price=selling_price,
         quantity=quantity,
         category_id=category_id,
@@ -58,19 +56,15 @@ def create_new_prod(
 def parse_update_product_form(
     name: Optional[str] = Form(None),
     description: Optional[str] = Form(None),
-    last_unit_price: Optional[Decimal] = Form(None),
-    curr_unit_price: Optional[Decimal] = Form(None),
     selling_price: Optional[Decimal] = Form(None),
-    stock_quantity: Optional[int] = Form(None),
+    quantity: Optional[int] = Form(None),
     category_id: Optional[int] = Form(None),
 ):
     return UpdateProdSchema(
         name=name,
         description=description,
-        last_unit_price=last_unit_price,
-        curr_unit_price=curr_unit_price,
         selling_price=selling_price,
-        stock_quantity=stock_quantity,
+        quantity=quantity,
         category_id=category_id,
     )
 

@@ -13,11 +13,14 @@ from schemas.purchase import (
     PurResSchema,
     PurSchema,
     UpdateSupplierSchema,
+    UpdatePurSchema,
+    UpdatePurProdSchema,
 )
-from utils import convert_decimal, convert_to_dict_data
+from utils import convert_decimal, convert_to_dict_data, convert_update_data
 
 from .product import find_prod_by_id
 from .supplier import find_sup_by_id
+from typing import Optional
 
 PUR_RESOURCE = "Purchase"
 PUR_PROD_RESOURCE = "Purchase product"
@@ -70,10 +73,9 @@ def create_new_pur_prod(
     )
     db.add(new_pur_prod)
 
-    # update product
+    # update product quantity
     if is_update_prod:
-        db_prod.unit_price = unit_price
-        db_prod.stock_quantity = db_prod.stock_quantity + data.quantity
+        db_prod.quantity = db_prod.quantity + data.quantity
 
 
 def create_multi_pur_prods(data: CreateMultiPurProdSchema, db: Session):
@@ -95,12 +97,15 @@ def create_multi_pur_prods(data: CreateMultiPurProdSchema, db: Session):
 def create_new_pur(data: PurSchema, db: Session):
     sup_id = data.supplier_id
     pur_prods = data.products
-    is_update_prod = data.is_update_prod
+    is_update_prod = data.is_update_product
+    import_date = data.import_date
 
     if not db.query(exists().where(Supplier.id == sup_id)).scalar():
         return exception_res.not_found(err_msg.not_found("Supplier"))
 
-    new_pur = Purchase(supplier_id=sup_id, is_update_product=is_update_prod)
+    new_pur = Purchase(
+        supplier_id=sup_id, is_update_product=is_update_prod, import_date=import_date
+    )
 
     db.add(new_pur)
     db.flush()
@@ -116,6 +121,51 @@ def create_new_pur(data: PurSchema, db: Session):
         data=convert_to_dict_data(PurResSchema, new_pur),
         detail=success_msg.create(PUR_RESOURCE),
     )
+
+
+def update_pur_prod(
+    data: UpdatePurProdSchema, is_update_prod: Optional[bool], db: Session
+):
+    db_pur_prod = find_pur_prod_by_id(data.id, db)
+    pur_prod_quantity = db_pur_prod.quantity
+    update_data = convert_update_data(data)
+    for key, val in update_data.items():
+        setattr(db_pur_prod, key, val)
+
+    # is_update_prod=True, update add product quantity
+    # is_update_prod=False, update product quantity back to the initial val
+    # is_update_prod=None, doesn't update product
+    db_prod = find_prod_by_id(data.product_id, db)
+    if is_update_prod is True:
+        db_prod.quantity = db_prod.quantity + data.quantity
+    elif is_update_prod is False:
+        db_prod.quantity = db_prod.quantity - pur_prod_quantity
+
+
+def update_pur_by_id(data: UpdatePurSchema, id: int, db: Session):
+    sup_id = data.supplier_id
+    import_date = data.import_date
+    is_update_prod = data.is_update_product
+    prods = data.products
+
+    db_pur = find_pur_by_id(id, db)
+    if sup_id:
+        db_pur.supplier_id = sup_id
+    if import_date:
+        db_pur.import_date = import_date
+    if is_update_prod:
+        if db_pur.is_update_product == is_update_prod:
+            is_update_prod = None
+        else:
+            db_pur.is_update_product = is_update_prod
+    if prods:
+        for prod in prods:
+            update_pur_prod(prod, is_update_prod, db)
+
+    db.commit()
+    db.refresh(db_pur)
+
+    return success_res.ok(data=convert_to_dict_data(PurResSchema, db_pur))
 
 
 def update_supplier_id(data: UpdateSupplierSchema, purchase_id: int, db: Session):

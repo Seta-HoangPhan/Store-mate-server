@@ -8,7 +8,6 @@ from .base import BaseSchemaModel
 class ProdSchema(BaseSchemaModel):
     name: str
     description: Optional[str] = None
-    unit_price: Decimal
     selling_price: Decimal
     quantity: int
     category_id: Optional[int] = None
@@ -34,7 +33,6 @@ class ProdResSchema(BaseSchemaModel):
     name: str
     description: Optional[str]
     thumbnail: Optional[str] = None
-    unit_price: float
     selling_price: Optional[float] = None
     quantity: int
     category: Optional[PartialCategorySchema] = None
