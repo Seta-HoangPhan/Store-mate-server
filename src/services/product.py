@@ -1,5 +1,7 @@
+from typing import Optional
+
 from fastapi import UploadFile
-from sqlalchemy import exists
+from sqlalchemy import desc, exists
 from sqlalchemy.orm import Session
 
 from cloudinary_config import delete_image, upload_image_to_cloudinary
@@ -8,8 +10,8 @@ from models.purchase import PurchaseProduct
 from response import err_msg, exception_res, success_msg, success_res
 from schemas.product import ProdResSchema, ProdSchema, UpdateProdSchema
 from schemas.purchase import PurProdResSchema
-from utils import convert_decimal, convert_to_dict_data, convert_update_data
 from services import category as cat_service
+from utils import convert_decimal, convert_to_dict_data, convert_update_data
 
 RESOURCE = "Product"
 DECIMAL_FIELDS = {"last_unit_price", "curr_unit_price", "selling_price"}
@@ -46,20 +48,34 @@ def get_prod_by_id(id: int, db: Session):
     )
 
 
-def get_prods_by_cat_ids(cat_ids: list[int], db: Session):
+def get_prods_by_cat_ids(
+    cat_ids: list[int], prod_create_cat_id: Optional[int], db: Session
+):
     filter_cat_ids = cat_ids
+
     if len(cat_ids) == 0:
         db_cats = db.query(Category).all()
         filter_cat_ids = [cat.id for cat in db_cats]
+
     cat_prods = {}
     for cat_id in filter_cat_ids:
         db_cat = cat_service.find_cat_by_id(cat_id, db)
-        prods = db.query(Product).filter(Product.category_id == db_cat.id).all()
-        cat_prods[db_cat.id] = [
+        prods = (
+            db.query(Product)
+            .filter(Product.category_id == db_cat.id)
+            .order_by(desc(Product.created_at))
+            .all()
+        )
+        cat_prods[f"cat-{db_cat.id}"] = [
             convert_to_dict_data(ProdResSchema, prod) for prod in prods
         ]
 
-    return success_res.ok(data=cat_prods)
+    sorted_cat_prods = sorted(cat_prods.items(), key=lambda x: len(x[1]), reverse=True)
+    if prod_create_cat_id:
+        key = f"cat-{prod_create_cat_id}"
+        sorted_cat_prods.sort(key=lambda x: x[0] != key)
+
+    return success_res.ok(data=dict(sorted_cat_prods))
 
 
 # allow admin create product first time

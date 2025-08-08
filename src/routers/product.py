@@ -15,9 +15,10 @@ router = APIRouter(prefix="/products", dependencies=[Depends(get_me)])
 @router.get("")
 def get_prods_by_cat_ids(
     cat_ids: list[int] = Query(default=[]),
+    prod_create_cat_id: Optional[int] = Query(default=None),
     db: Session = Depends(get_db),
 ):
-    return service.get_prods_by_cat_ids(cat_ids, db)
+    return service.get_prods_by_cat_ids(cat_ids, prod_create_cat_id, db)
 
 
 @router.get("/{id}")
