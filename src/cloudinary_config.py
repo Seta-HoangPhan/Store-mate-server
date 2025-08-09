@@ -19,5 +19,5 @@ def upload_image_to_cloudinary(file: UploadFile):
     }
 
 
-def delete_image(public_id: str):
+def delete_image_from_cloudinary(public_id: str):
     cloudinary.uploader.destroy(public_id)

@@ -4,7 +4,7 @@ from fastapi import UploadFile
 from sqlalchemy import desc, exists
 from sqlalchemy.orm import Session
 
-from cloudinary_config import delete_image, upload_image_to_cloudinary
+from cloudinary_config import delete_image_from_cloudinary, upload_image_to_cloudinary
 from models.product import Category, Product
 from models.purchase import PurchaseProduct
 from response import err_msg, exception_res, success_msg, success_res
@@ -123,7 +123,7 @@ def update_prod_by_id(
 
     if thumnail_file:
         if db_prod.thumbnail_id:
-            delete_image(db_prod.thumbnail_id)
+            delete_image_from_cloudinary(db_prod.thumbnail_id)
 
         upload = upload_image_to_cloudinary(thumnail_file)
         update_data["thumbnail"] = upload["secure_url"] if upload else None
