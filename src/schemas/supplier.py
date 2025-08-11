@@ -27,9 +27,14 @@ class SupResSchema(BaseSchemaModel):
     address: str
 
 
+class UpdatePhoneSchema(BaseSchemaModel):
+    id: Optional[int] = None
+    phone: str
+
+
 class UpdateSupSchema(BaseSchemaModel):
     name: Optional[str] = None
-    phones: Optional[list[PhoneSchema]] = []
+    phones: Optional[list[UpdatePhoneSchema]] = None
     email: Optional[EmailStr] = None
     address: Optional[str] = None
 

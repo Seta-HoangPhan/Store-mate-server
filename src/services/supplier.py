@@ -1,12 +1,19 @@
-from sqlalchemy import exists, func
+from sqlalchemy import exists, func, desc
 from sqlalchemy.orm import Session
 
 from models.supplier import Supplier, SupplierPhone
 from response import err_msg, exception_res, success_msg, success_res
-from schemas.supplier import SupResSchema, SupSchema, UpdateSupSchema
+from schemas.supplier import SupResSchema, SupSchema, UpdateSupSchema, UpdatePhoneSchema
 from utils import convert_to_dict_data, convert_update_data
 
 RESOURCE = "Supplier"
+
+
+def get_data(data: Supplier | list[Supplier]):
+    if isinstance(data, list):
+        return [convert_to_dict_data(SupResSchema, supplier) for supplier in data]
+
+    return convert_to_dict_data(SupResSchema, data)
 
 
 def find_sup_by_id(id: int, db: Session):
@@ -17,10 +24,13 @@ def find_sup_by_id(id: int, db: Session):
 
 
 def get_all_sups(db: Session):
-    db_suppliers = db.query(Supplier).all()
-    return success_res.ok(
-        data=[convert_to_dict_data(SupResSchema, supplier) for supplier in db_suppliers]
-    )
+    db_suppliers = db.query(Supplier).order_by(desc(Supplier.created_at)).all()
+    return success_res.ok(data=get_data(db_suppliers))
+
+
+def get_sup_by_id(id: int, db: Session):
+    db_sup = find_sup_by_id(id, db)
+    return success_res.ok(data=get_data(db_sup))
 
 
 def search_sups_by_name(search: str, db: Session):
@@ -29,9 +39,7 @@ def search_sups_by_name(search: str, db: Session):
         .filter(func.unaccent(Supplier.name).ilike(f"%{search}%"))
         .all()
     )
-    return success_res.ok(
-        data=[convert_to_dict_data(SupResSchema, supplier) for supplier in db_suppliers]
-    )
+    return success_res.ok(data=get_data(db_suppliers))
 
 
 def create_new_sup(data: SupSchema, db: Session):
@@ -67,7 +75,7 @@ def create_new_sup(data: SupSchema, db: Session):
     db.refresh(new_sup)
 
     return success_res.create(
-        data=convert_to_dict_data(SupResSchema, new_sup),
+        data=get_data(new_sup),
         detail=success_msg.create(RESOURCE),
     )
 
@@ -87,19 +95,33 @@ def update_sup_phone(data: dict, sup_id: int, db: Session):
 def update_sup(data: UpdateSupSchema, id: int, db: Session):
     db_sup = find_sup_by_id(id, db)
 
+    phones = [
+        UpdatePhoneSchema(**p) if isinstance(p, dict) else p
+        for p in (data.phones or [])
+    ]
+    phones_ids = [phone.id for phone in phones if phone.id is not None]
+
     update_data = convert_update_data(data)
     for key, value in update_data.items():
         if key != "phones":
             setattr(db_sup, key, value)
 
-    if len(update_data["phones"]) > 0:
-        for phone in update_data["phones"]:
+    # delete all phones nin db that don't exist in request phones list
+    db.query(SupplierPhone).filter(
+        SupplierPhone.supplier_id == id, ~SupplierPhone.id.in_(phones_ids)
+    ).delete(synchronize_session=False)
+
+    for phone in phones:
+        if phone.id is None:
+            new_sup_phone = SupplierPhone(phone=phone.phone.strip(), supplier_id=id)
+            db.add(new_sup_phone)
+        else:
             update_sup_phone(phone, db_sup.id, db)
 
     db.commit()
     db.refresh(db_sup)
 
-    return success_res.create(
-        data=convert_to_dict_data(SupResSchema, db_sup),
+    return success_res.ok(
+        data=get_data(db_sup),
         detail=success_msg.update(RESOURCE),
     )

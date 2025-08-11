@@ -15,7 +15,7 @@ def validate_phone(v: str):
 # phones can be list[str] or list[Schema]
 def validate_phone_list(phones: list):
     if len(phones) == 0:
-        raise ValueError(err_msg.missing("Phone number"))
+        return []
 
     normalized_phones = []
     if isinstance(phones[0], str):

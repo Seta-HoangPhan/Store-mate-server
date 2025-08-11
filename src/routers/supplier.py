@@ -13,6 +13,11 @@ def get_all_sups(db: Session = Depends(get_db)):
     return service.get_all_sups(db)
 
 
+@router.get("/{id}")
+def get_sup_by_id(id: int, db: Session = Depends(get_db)):
+    return service.get_sup_by_id(id, db)
+
+
 @router.get("/search")
 def search_sups_by_name(name: str = Query(...), db: Session = Depends(get_db)):
     return service.search_sups_by_name(name, db)
